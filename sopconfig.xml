@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sopconfig xmlns:syberos="http://schemas.syberos.com/sop/res/syberos/v1" syberos:versionCode="1" syberos:sopid="com.syberos.SyberH5Framework" syberos:shareUserId="" syberos:versionName="1.0.0">
+    <uses-permission syberos:name="syberos.permission.ACCESS_DATA_NETWORK"/>
+    <uses-permission syberos:name="syberos.permission.ACCESS_WIFI"/>
+    <uses-sdk syberos:targetSdkVersion="" syberos:minSdkVersion=""/>
+    <application syberos:description="加载本地H5+ajax进行H5应用开发" syberos:name="SyberH5Framework" syberos:icon="res/SyberH5Framework.png" syberos:debuggable="true">
+        <uiapp syberos:name="" syberos:icon="res/SyberH5Framework.png" syberos:launcher="true" syberos:splash="" syberos:background="" syberos:id="SyberH5Framework" syberos:exec="bin/SyberH5Framework">
+            <doctype syberos:id=""/>
+        </uiapp>
+    </application>
+</sopconfig>
