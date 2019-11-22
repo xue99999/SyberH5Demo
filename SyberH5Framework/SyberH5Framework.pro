@@ -20,10 +20,18 @@ OTHER_FILES += $$QML_FILES *.qm \
 # The .cpp file which was generated for your project.
 SOURCES += src/main.cpp \
            src/SyberH5Framework_Workspace.cpp \
-    src/syberh5helpper.cpp
+    src/syberh5helpper.cpp \
+    src/biginteger.cpp \
+    src/rsa.cpp \
+    src/encryptdecrypt.cpp \
+    src/qaesencryption.cpp
 
 HEADERS += src/SyberH5Framework_Workspace.h \
-    src/syberh5helpper.h
+    src/syberh5helpper.h \
+    src/biginteger.h \
+    src/rsa.h \
+    src/encryptdecrypt.h \
+    src/qaesencryption.h
 
 # Installation path
 target.path = $$INSTALL_DIR/bin

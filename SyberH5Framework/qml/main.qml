@@ -15,9 +15,7 @@ CPageStackWindow {
         Connections{
             target: syberH5Helper
             onResultStr:{
-
                 listModel.append({"logStr": str})
-
                 console.log(" ----- str: ", str)
             }
         }
@@ -142,7 +140,7 @@ CPageStackWindow {
                         anchors.left: parent.left
                         anchors.leftMargin: 20
                         font.pixelSize: itemHandel.fontSize
-                        text: qsTr("数组循环数量:")
+                        text: qsTr("循环数量:")
                     }
 
                     TextEdit {
@@ -216,7 +214,7 @@ CPageStackWindow {
                         Text {
                             anchors.centerIn: parent
                             font.pixelSize: itemHandel.fontSize
-                            text: qsTr("创建数组")
+                            text: qsTr("开始")
                         }
 
                         MouseArea {

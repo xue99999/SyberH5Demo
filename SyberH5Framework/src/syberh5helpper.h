@@ -37,10 +37,19 @@ private:
     // 每个数组的大小
     int itemArrSize;
     int result;
+    //加密密钥
+    QString key;
+    //加密信息
+    QString message;
 
     int startNewArr();
     int startFib();
     int fib2(int n);
+
+    int testRsa();
+    int testSha256();
+
+    int testAES();
 };
 
 #endif // SYBERH5HELPPER_H
