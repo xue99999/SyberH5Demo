@@ -8,6 +8,8 @@
 
 #include <iostream>
 #include <ctime>
+#include <QString>
+#include <QDebug>
 #include "encryptdecrypt.h"
 
 /**
@@ -26,47 +28,49 @@ void EncryptDecrypt::menu() {
 /**
  * 函数功能:加密运算
  */
-bool EncryptDecrypt::encrypt() {
-    std::string str;
-    std::cout << "输入16进制数据:" << std::endl;
-    std::cout << ">";
-    std::cin >> str;// 输入明文
-    if (!std::cin || !islegal(str))
-        return false;
-    BigInteger m(str);
+QString EncryptDecrypt::encrypt(QString str) {
+    //std::string str;
+    //std::cout << "输入16进制数据:" << std::endl;
+    //std::cout << ">";
+    qDebug() << "输入明文" << str;
+    //std::cin >> str;// 输入明文
+//    if (!std::cin || !islegal(str))
+//        return false;
+    BigInteger m(str.toStdString());
     clock_t start = clock();
     BigInteger c = rsa.encryptByPublic(m);
+     qDebug() << "密文" << QString::fromStdString(c.toString());
     clock_t finish = clock();
 
-    std::cout << std::fixed;
-    std::cout.precision(3);
+    //std::cout << std::fixed;
+    //std::cout.precision(3);
     std::cout << "用时: " << (double)(finish-start)/CLOCKS_PER_SEC << "s." << std::endl;
-    std::cout << "明文: " << m << std::endl;
-    std::cout << "密文: " << c << std::endl;
-    return true;
+    //std::cout << "明文: " << m << std::endl;
+    //std::cout << "密文: " << c << std::endl;
+    return QString::fromStdString(c.toString());
 }
 
 /**
  * 函数功能:解密运算
  */
-bool EncryptDecrypt::decrypt() {
-    std::string str;
-    std::cout << "输入16进制数据:" << std::endl;
-    std::cout << ">";
-    std::cin >> str;// 输入密文
-    if (!std::cin || !islegal(str))
-        return false;
-    BigInteger c(str);
-    clock_t start = clock();
+QString EncryptDecrypt::decrypt(QString str) {
+//    std::string str;
+//    std::cout << "输入16进制数据:" << std::endl;
+//    std::cout << ">";
+//    std::cin >> str;// 输入密文
+//    if (!std::cin || !islegal(str))
+//        return false;
+    BigInteger c(str.toStdString());
+    //clock_t start = clock();
     BigInteger m = rsa.decryptByPrivate(c);
-    clock_t finish = clock();
+    //clock_t finish = clock();
 
-    std::cout << std::fixed;
-    std::cout.precision(3);
-    std::cout << "用时: " << (double)(finish-start)/CLOCKS_PER_SEC << "s." << std::endl;
-    std::cout << "密文: " << c << std::endl;
+//    std::cout << std::fixed;
+//    std::cout.precision(3);
+//    std::cout << "用时: " << (double)(finish-start)/CLOCKS_PER_SEC << "s." << std::endl;
+   std::cout << "密文: " << c << std::endl;
     std::cout << "明文: " << m << std::endl;
-    return true;
+    return QString::fromStdString(m.toString());
 }
 
 /**

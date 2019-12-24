@@ -24,14 +24,18 @@ SOURCES += src/main.cpp \
     src/biginteger.cpp \
     src/rsa.cpp \
     src/encryptdecrypt.cpp \
-    src/qaesencryption.cpp
+    src/taesclass.cpp \
+    src/aes.cpp \
+    src/base64.cpp
 
 HEADERS += src/SyberH5Framework_Workspace.h \
     src/syberh5helpper.h \
     src/biginteger.h \
     src/rsa.h \
     src/encryptdecrypt.h \
-    src/qaesencryption.h
+    src/taesclass.h \
+    src/aes.h \
+    src/base64.h
 
 # Installation path
 target.path = $$INSTALL_DIR/bin

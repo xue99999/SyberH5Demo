@@ -12,11 +12,86 @@
 #include<sys/timeb.h>
 #include <sys/time.h>
 #include <QMessageAuthenticationCode>
-
-#include "qaesencryption.h"
+#include "taesclass.h"
 #include <QCryptographicHash>
+#include "encryptdecrypt.h"
+#include "aes.h"
+#include"base64.h"
 
 using namespace std;
+const char g_iv[17] = "gfdertfghjkuyrtg";
+
+const char g_key[17] = "1234567812345678";
+string EncryptionAES(const string& strSrc) //AES加密
+{
+    size_t length = strSrc.length();
+    int block_num = length / BLOCK_SIZE + 1;
+    //明文
+    char* szDataIn = new char[block_num * BLOCK_SIZE + 1];
+    memset(szDataIn, 0x00, block_num * BLOCK_SIZE + 1);
+    strcpy(szDataIn, strSrc.c_str());
+
+    //进行PKCS7Padding填充。
+    int k = length % BLOCK_SIZE;
+    int j = length / BLOCK_SIZE;
+    int padding = BLOCK_SIZE - k;
+    for (int i = 0; i < padding; i++)
+    {
+        szDataIn[j * BLOCK_SIZE + k + i] = padding;
+    }
+    szDataIn[block_num * BLOCK_SIZE] = '\0';
+
+    //加密后的密文
+    char *szDataOut = new char[block_num * BLOCK_SIZE + 1];
+    memset(szDataOut, 0, block_num * BLOCK_SIZE + 1);
+
+    //进行进行AES的CBC模式加密
+    AES aes;
+    aes.MakeKey(g_key, g_iv, 16, 16);
+    aes.Encrypt(szDataIn, szDataOut, block_num * BLOCK_SIZE, AES::CBC);
+    string str = base64_encode((unsigned char*) szDataOut,
+            block_num * BLOCK_SIZE);
+    delete[] szDataIn;
+    delete[] szDataOut;
+    return str;
+}
+string DecryptionAES(const string& strSrc) //AES解密
+{
+    string strData = base64_decode(strSrc);
+    size_t length = strData.length();
+    //密文
+    char *szDataIn = new char[length + 1];
+    memcpy(szDataIn, strData.c_str(), length+1);
+    //明文
+    char *szDataOut = new char[length + 1];
+    memcpy(szDataOut, strData.c_str(), length+1);
+
+    //进行AES的CBC模式解密
+    AES aes;
+    aes.MakeKey(g_key, g_iv, 16, 16);
+    aes.Decrypt(szDataIn, szDataOut, length, AES::CBC);
+
+    //去PKCS7Padding填充
+    if (0x00 < szDataOut[length - 1] <= 0x16)
+    {
+        int tmp = szDataOut[length - 1];
+        for (int i = length - 1; i >= length - tmp; i--)
+        {
+            if (szDataOut[i] != tmp)
+            {
+                memset(szDataOut, 0, length);
+                cout << "去填充失败！解密出错！！" << endl;
+                break;
+            }
+            else
+                szDataOut[i] = 0;
+        }
+    }
+    string strDest(szDataOut);
+    delete[] szDataIn;
+    delete[] szDataOut;
+    return strDest;
+}
 
 SyberH5Helpper::SyberH5Helpper(QObject *parent) : QObject(parent)
 {
@@ -39,9 +114,9 @@ SyberH5Helpper::SyberH5Helpper(QObject *parent) : QObject(parent)
 int SyberH5Helpper::testRsa(){
 
     cout << "\n testRsa start\n" << endl;
-     emit resultStr("Rsa");
+     emit resultStr("Rsa加密");
      struct timeval  t1,t2;
-
+    EncryptDecrypt encrypt_decrypt;
     long t;
     gettimeofday( &t1, NULL );
     //ftime(&t1); /* 求得当前时间 */
@@ -51,13 +126,13 @@ int SyberH5Helpper::testRsa(){
     //cout << "开始时间: " << star_t << endl;
 
     //emit resultStr("开始时间: " + QString::number(star_t));
-
-    QMessageAuthenticationCode code(QCryptographicHash::Sha256);
-    code.setKey(key.toUtf8());
-    code.addData(message.toUtf8());
-    QByteArray res=code.result().toHex();
-    QString ssss = res;
-    qDebug() << res.size();
+    QString str1=encrypt_decrypt.encrypt(message);
+//    QMessageAuthenticationCode code(QCryptographicHash::Sha256);
+//    code.setKey(key.toUtf8());
+//    code.addData(message.toUtf8());
+//    QByteArray res=code.result().toHex();
+//    QString ssss = res;
+//    qDebug() << res.size();
     //cout << "QByteArray res:" << ssss  << endl;
     //ftime(&t2); /* 求得当前时间 */
        gettimeofday( &t2, NULL );
@@ -68,8 +143,16 @@ int SyberH5Helpper::testRsa(){
     //t= end_t - star_t; /* 计算时间差 */
 
     //emit resultStr("结束时间: " + QString::number(end_t));
-    emit resultStr("用时: " + QString::number(t) + "微秒");
-    emit resultStr("运行数值: " + ssss);
+    emit resultStr("加密用时: " + QString::number(t) + "微秒");
+    //emit resultStr("运行数值: " + ssss);
+
+       emit resultStr("Rsa解密");
+      gettimeofday( &t1, NULL );
+      QString str2=encrypt_decrypt.decrypt(str1);
+      gettimeofday( &t2, NULL );
+
+       t = 1000000 * (t1.tv_sec - t2.tv_sec ) + t2.tv_usec - t1.tv_usec;
+       emit resultStr("加密用时: " + QString::number(t) + "微秒");
     cout << "\n testRsa end \n" << endl;
 }
 
@@ -113,40 +196,39 @@ int SyberH5Helpper::testSha256(){
 
 
 int SyberH5Helpper::testAES(){
+    cout << "\n AES start \n" << endl;
 
-    cout << "\n AES start\n" << endl;
-     emit resultStr("AES");
+
+
+     emit resultStr("AES加密");
      struct timeval  t1,t2;
 
     long t;
     gettimeofday( &t1, NULL );
-    //ftime(&t1); /* 求得当前时间 */
 
-    //u_int64_t star_t = t1.time*1000 + t1.millitm;
 
-    //cout << "开始时间: " << star_t << endl;
+      string str1=message.toStdString();
+      //string  key  = key.toStdString();
+      qDebug() << "加密前:" << message;
+      string str2 = EncryptionAES(str1);
 
-    //emit resultStr("开始时间: " + QString::number(star_t));
-
-    QAESEncryption encryption(QAESEncryption::AES_128, QAESEncryption::ECB, QAESEncryption::ZERO);
-       QByteArray hashKey = QCryptographicHash::hash(key.toUtf8(), QCryptographicHash::Md5);
-       QByteArray encodedText = encryption.encode(message.toUtf8(), hashKey);
-
-    QString ssss = encodedText;
-    qDebug() << res.size();
-    //cout << "QByteArray res:" << ssss  << endl;
-    //ftime(&t2); /* 求得当前时间 */
-       gettimeofday( &t2, NULL );
+      cout << "加密后:" << str2 << endl;
+      gettimeofday( &t2, NULL );
       t = 1000000 * (t1.tv_sec - t2.tv_sec ) + t2.tv_usec - t1.tv_usec;
-    //t=(t2.time-t1.time)*1000+(t2.-t1.millitm);
 
-
-    //t= end_t - star_t; /* 计算时间差 */
-
-    //emit resultStr("结束时间: " + QString::number(end_t));
     emit resultStr("用时: " + QString::number(t) + "微秒");
-    emit resultStr("运行数值: " + ssss);
-    cout << "\n Sha256 end \n" << endl;
+    emit resultStr("加密数值: " + QString(QString::fromStdString(str2)));
+    emit resultStr("AES解密");
+
+      gettimeofday( &t1, NULL );
+      string str3 = DecryptionAES(str2);
+      gettimeofday( &t2, NULL );
+      t = 1000000 * (t1.tv_sec - t2.tv_sec ) + t2.tv_usec - t1.tv_usec;
+        qDebug() << "解密数据:" <<QString::fromStdString(str3) <<"\n" ;
+      emit resultStr("用时: " + QString::number(t) + "微秒");
+      emit resultStr("运行数值: " +  QString(QString::fromStdString(str3)));
+    cout << "\n AES end \n" << endl;
+
 }
 
 

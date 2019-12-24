@@ -5,20 +5,22 @@
  * @Link    : http://www.cnblogs.com/Silenceneo-xw/
  * @Version : 2.0
  */
-
+#include"QtCore"
 #ifndef __ENCRYPTDECRYPT_H__
 #define __ENCRYPTDECRYPT_H__
 
 #include <string>
+#include <QString>
 #include "rsa.h"
+#include"biginteger.h"
 class EncryptDecrypt {
 public:
     EncryptDecrypt() {}
     ~EncryptDecrypt() {}
 
     void menu();    // 菜单显示
-    bool encrypt();    // 加密
-    bool decrypt();    // 解密
+    QString encrypt(QString str);    // 加密
+    QString decrypt(QString str);    // 解密
     void print();    // 打印RSA相关信息
     void reset();    // 重置RSA相关信息
 protected:

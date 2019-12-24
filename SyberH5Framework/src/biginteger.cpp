@@ -286,7 +286,7 @@ BigInteger BigInteger::pow(const BigInteger & exponent) {
  * 参数含义:exponent代表指数,m代表模数
  */
 BigInteger BigInteger::modPow(const BigInteger & exponent, const BigInteger & m) const {
-    assert(!m.equals(ZERO));
+    //assert(!m.equals(ZERO));
     BigInteger ans(1);
     bit t(exponent);
     for (int i=t.size()-1; i>=0; --i) {
